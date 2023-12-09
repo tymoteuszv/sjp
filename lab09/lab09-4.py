@@ -11,6 +11,7 @@ Usage: python script_name.py [options]
 Options:
   -h, --help          Show this help message and exit
   -i, --input         Specify input file
+  -d, --date          Specify date offset in dd.mm.rrrr.hh.mm.ss format
 """)
 
 
@@ -23,7 +24,8 @@ def parse(timestamp: str) -> (datetime, bool):
     try:
         parsed = datetime.strptime(timestamp, "%b%d %H:%M")
     except ValueError:
-        parsed = datetime.strptime(timestamp, "%S,%f")
+        seconds, microseconds = timestamp.split(".")
+        parsed = timedelta(seconds=int(seconds), microseconds=int(microseconds))
     return parsed
 
 
@@ -40,32 +42,41 @@ def process_line(raw_line: str, base_time: datetime) -> str:
     except IndexError:
         return line
     parsed_time = parse(raw_timestamp)
-    offset = timedelta(seconds=parsed_time.second, microseconds=parsed_time.microsecond)
+    offset = parsed_time
     parsed_time = base_time + offset
-    converted_timestamp = datetime.strftime(parsed_time, "%a %b%-d %H:%M %Y")
+    converted_timestamp = datetime.strftime(parsed_time, "%a %b %-d %H:%M:%S %Y")
     return "[{}]{}".format(converted_timestamp, message)
 
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:", ["help", "input="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:d:", ["help", "input=", "date="])
     except getopt.GetoptError as err:
         print(err)
         sys.exit()
     if len(opts) == 0:
         usage()
         sys.exit()
-
+    offset_date = None
+    input_stream = sys.stdin
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-        elif o in ("-w", "--weekday"):
-            print("Dzisiejszy dzień tygodnia: {}".format(find_weekday(date)))
-    with open("../dmesg.h.log", "r") as file:
-        base_time = None
-        for line in file:
-            print(process_line(line, test_date))
+        elif o in ("-i", "--input"):
+            input_stream = open(a, "r")
+        elif o in ("-d", "--date"):
+            unparsed_date = a
+            try:
+                offset_date = datetime.strptime(unparsed_date, "%d.%m.%Y.%H.%M.%S")
+            except ValueError as err:
+                print(err)
+                usage()
+                sys.exit()
+    if offset_date is None:
+        raise ValueError("Offset date not set")
+    for line in input_stream:
+        print(process_line(line, offset_date))
 
 
 if __name__ == "__main__":
