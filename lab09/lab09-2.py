@@ -18,20 +18,24 @@ Options:
 
 
 def find_weekday(date):
+    """Find the weekday of a given date and return it as a string"""
     return date.strftime("%A")
 
 
 def find_month_weekday(date):
+    """Find the weekday of the first day of the month of a given date and return it as a string"""
     date = date.replace(day=1)
     return find_weekday(date)
 
 
 def print_month(date):
+    """Print the calendar for the month of a given date"""
     cal = calendar.TextCalendar()
     cal.prmonth(date.year, date.month)
 
 
 def parse_input_date(query: str):
+    """Parse input date in dd.mm.yyyy format and return it as a datetime object"""
     while True:
         unparsed_date = input(query)
         try:
@@ -44,6 +48,7 @@ def parse_input_date(query: str):
 
 
 def main():
+    """Set the locale and execute the task specified in the lab instructions"""
     locale.setlocale(locale.LC_TIME, "pl_PL")
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hwsc", ["help", "weekday", "first_weekday", "show_calendar"])

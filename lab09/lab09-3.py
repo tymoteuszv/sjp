@@ -17,13 +17,15 @@ Options:
 
 
 def order_dates(date_1, date_2):
+    """Order two dates chronologically and return them as a tuple"""
     if date_1 > date_2:
         return date_2, date_1
     return date_1, date_2
 
 
 def between_count_weekday(start: datetime, end: datetime, isoweekday: int):
-    # make a generator object of days BETWEEN dates (the (start,end) interval)
+    """Count the number of specific weekday occurrences between two dates, with the first and last date excluded
+    Monday is 1, Sunday is 7 as per ISO 8601"""
     dates_between = (start + timedelta(x + 1) for x in range((end - start).days - 1))
     counter = 0
     for date in dates_between:
@@ -33,7 +35,7 @@ def between_count_weekday(start: datetime, end: datetime, isoweekday: int):
 
 
 def between_count_yearday(start, end, month, day):
-    # make a generator object of days BETWEEN dates (the (start,end) interval)
+    """Count the number of specific day occurrences between two dates, with the first and last date excluded"""
     dates_between = (start + timedelta(x + 1) for x in range((end - start).days - 1))
     counter = 0
     for date in dates_between:
@@ -43,6 +45,7 @@ def between_count_yearday(start, end, month, day):
 
 
 def parse_input_date(query: str):
+    """Parse input date in dd.mm.yyyy format and return it as a datetime object"""
     while True:
         unparsed_date = input(query)
         try:
@@ -75,7 +78,7 @@ def main():
             days_elapsed = (end - start).days
             print(f"Days elapsed between {start.date()} and {end.date()}: {days_elapsed} days")
         elif o in ("-t", "--thursdays"):
-            thursdays_count = between_count_weekday(start, end, 4)  # 4 to czwartek
+            thursdays_count = between_count_weekday(start, end, 4)  # Thursday is 4
             print(f"Number of Thursdays between {start.date()} and {end.date()}: {thursdays_count}")
         elif o in ("-l", "--leap_days"):
             leap_days_count = between_count_yearday(start, end, 2, 29)

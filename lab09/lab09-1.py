@@ -11,6 +11,7 @@ class TimeConverter:
     DATE_FORMAT = "%a, %-d %b %Y, %X %Z"
 
     def __init__(self):
+        """Set the locale and execute the task specified in the lab instructions"""
         locale.setlocale(locale.LC_TIME, "pl_PL")
         while True:
             user_input = input(
@@ -28,6 +29,7 @@ class TimeConverter:
 
     @staticmethod
     def is_valid_input(user_input) -> bool:
+        """Check if the user input is a valid time difference with regular expression"""
         regular_expression = rf"^([0-9]+[{''.join(TimeConverter.TIME_UNITS)}]){{0,4}}$"
         for character in TimeConverter.TIME_UNITS:
             if user_input.count(character) > 1:
@@ -36,6 +38,7 @@ class TimeConverter:
 
     @staticmethod
     def parse_input_to_dict(user_input) -> dict[str, int]:
+        """Parse the user input and return a dictionary with the values of the time units"""
         parsed_time_dict = {}
         start_index = 0
         for end_index, character in enumerate(user_input):
@@ -49,10 +52,12 @@ class TimeConverter:
 
     @staticmethod
     def to_timedelta(time_dict) -> timedelta:
+        """Convert a dictionary with time units to a timedelta object"""
         return timedelta(days=time_dict.get("d", 0), hours=time_dict.get("h", 0),
                          minutes=time_dict.get("m", 0), seconds=time_dict.get("s", 0))
 
     def pretty_print(self) -> None:
+        """Print the time difference and the current time in CET and UTC (printed as GMT)"""
         print("{:10}{}".format("teraz:", self.cet_time.strftime(TimeConverter.DATE_FORMAT)))
         print("{:10}{}".format("GMT:", self.utc_time.strftime(TimeConverter.DATE_FORMAT)).replace("UTC", "GMT"))
         print("{:10}{}".format("wcześniej:",
